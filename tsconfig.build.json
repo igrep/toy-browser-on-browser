@@ -1,0 +1,7 @@
+{
+  "extends": [
+    "./tsconfig.json",
+    "./render/tsconfig.json",
+    "./chrome/tsconfig.json"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "@igrep/toy-browser-on-browser-chrome",
+  "private": true,
+  "version": "0.0.0",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {},
+  "dependencies": {
+    "@igrep/toy-browser-on-browser-render": "^0.0.0",
+    "parse5": "^7.1.2",
+    "rrweb-cssom": "^0.7.1"
+  }
+}

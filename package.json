@@ -1,0 +1,31 @@
+{
+  "name": "toy-browser-on-browser",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b tsconfig.build.json && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "format": "prettier --write */src/**/*.ts",
+    "prepare": "npm run build"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^7.13.1",
+    "@typescript-eslint/parser": "^7.13.1",
+    "@vitejs/plugin-react-swc": "^3.5.0",
+    "eslint": "^8.57.0",
+    "eslint-config-love": "^56.0.0",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-react-refresh": "^0.4.7",
+    "netlify-cli": "^17.33.3",
+    "prettier": "^3.3.3",
+    "typescript": "^5.2.2",
+    "vite": "^5.3.1"
+  },
+  "workspaces": [
+    "render/",
+    "chrome/"
+  ]
+}
