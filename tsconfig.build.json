@@ -1,7 +1,7 @@
 {
   "extends": [
     "./tsconfig.json",
-    "./render/tsconfig.json",
+    "./engine/tsconfig.json",
     "./chrome/tsconfig.json"
   ]
 }
