@@ -1,4 +1,4 @@
-declare module 'rrweb-cssom' {
+declare module "rrweb-cssom" {
   function parse(css: string): CSSStyleSheet;
 
   class CSSStyleSheet {
@@ -6,6 +6,12 @@ declare module 'rrweb-cssom' {
     cssRules: CSSRule[];
   }
 
-  type CSSRule = CSSStyleSheet|CSSMediaRule|CSSContainerRule|CSSSupportsRule|
-      CSSFontFaceRule|CSSKeyframesRule|CSSDocumentRule;
+  type CSSRule =
+    | CSSStyleSheet
+    | CSSMediaRule
+    | CSSContainerRule
+    | CSSSupportsRule
+    | CSSFontFaceRule
+    | CSSKeyframesRule
+    | CSSDocumentRule;
 }

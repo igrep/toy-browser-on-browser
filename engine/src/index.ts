@@ -1,7 +1,42 @@
 import * as parse5 from "parse5";
-import * as cssom from "rrweb-cssom";
+import type { VisitPage } from "./message";
+import { sendMessage } from "./to-engine-facade";
+//import * as cssom from "rrweb-cssom";
 
+//console.log(cssom.parse("body { color: red; }"));
 
+const LOAD_TIME_MILLISEC = 3000;
 
-console.log(parse5.parse("<!DOCTYPE html><html><body>hello</body></html>"));
-console.log(cssom.parse("body { color: red; }"));
+addEventListener("message", async (e): Promise<void> => {
+  switch (e.data.type) {
+    case "VisitPage": {
+      await new Promise((resolve) => setTimeout(resolve, LOAD_TIME_MILLISEC));
+      sendMessage({ type: "UpdateStatus", status: "startLoading" });
+      await new Promise((resolve) => setTimeout(resolve, LOAD_TIME_MILLISEC));
+      const { url } = e.data as VisitPage;
+      const path = parseToyBrowserProtocol(url);
+      console.debug("Fetching", path);
+      const res = await fetch(path);
+
+      // This must be false positive
+      // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+      if (!res.ok) {
+        console.error("Failed to fetch", path);
+        return;
+      }
+      console.log("Received new document", parse5.parse(await res.text()));
+      sendMessage({ type: "UpdateStatus", status: "finishLoading" });
+      break;
+    }
+    default:
+      console.error("Unknown message", e.data);
+      break;
+  }
+});
+
+// As far as I tried, this is the best way to make it work both in browser and in Node.js.
+function parseToyBrowserProtocol(url: string): string {
+  const { protocol } = new URL(url);
+  const lengthBeforePath = `${protocol}//`.length;
+  return `/${url.slice(lengthBeforePath)}.html`;
+}
