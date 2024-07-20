@@ -24,7 +24,9 @@ addEventListener("message", async (e): Promise<void> => {
         console.error("Failed to fetch", path);
         return;
       }
-      console.log("Received new document", parse5.parse(await res.text()));
+      const dom = parse5.parse(await res.text());
+      console.log("Received a new document", dom);
+      console.log(JSON.parse(JSON.stringify(dom, removeCircularReferences)));
       sendMessage({ type: "UpdateStatus", status: "finishLoading" });
       break;
     }
@@ -39,4 +41,12 @@ function parseToyBrowserProtocol(url: string): string {
   const { protocol } = new URL(url);
   const lengthBeforePath = `${protocol}//`.length;
   return `/${url.slice(lengthBeforePath)}.html`;
+}
+
+function removeCircularReferences(k: string, v: unknown): unknown {
+  if (k === "parentNode") {
+    return undefined;
+  }
+  return v;
+  
 }
