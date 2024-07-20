@@ -29,7 +29,7 @@ export default [
   ),
   {
     ...love,
-    files: ["**/*.ts"],
+    files: ["**/*.ts{x,}"],
     languageOptions: {
       globals: {
         ...globals.builtin,
