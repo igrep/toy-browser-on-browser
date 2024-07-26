@@ -48,5 +48,4 @@ function removeCircularReferences(k: string, v: unknown): unknown {
     return undefined;
   }
   return v;
-  
 }
