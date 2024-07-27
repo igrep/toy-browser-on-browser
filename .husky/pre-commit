@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set -u
+
+set +e
+jsFiles=($(git diff --cached --name-only --diff-filter=ACMR | grep -Ee '\.ts$'))
+set -e
+
+existingJsFiles=()
+for file in "${jsFiles[@]}"; do
+  if [ -f "$file" ]; then
+    existingJsFiles+=("$file")
+  fi
+done
+
+if [ "${#existingJsFiles[@]}" -ne 0 ]; then
+  npx eslint --fix -- "${existingJsFiles[@]}"
+  npx prettier --write -- "${existingJsFiles[@]}"
+  git add -- "${existingJsFiles[@]}"
+fi
