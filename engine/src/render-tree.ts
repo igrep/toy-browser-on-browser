@@ -116,7 +116,7 @@ function matchesSelector(
       return selector.tagName === elementNode.tagName;
     case ".":
       return elementNode.attrs.some(
-        (attr) => attr.name === "class" && attr.value === selector.className,
+        (attr) => attr.name === "class" && attr.value.split(/\s+/).includes(selector.className),
       );
     case "#":
       return elementNode.attrs.some(

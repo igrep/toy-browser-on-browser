@@ -58,6 +58,18 @@ describe("buildRenderTree", () => {
       htmlBody: '<div class="test"><p class="test"></p></div>',
       expected: [element("div", block())],
     },
+
+    {
+      cssText: "#test { color: red; } .test { color: blue; }",
+      htmlBody: '<p id="test"></p>',
+      expected: [element("p", block({ color: "red" }))],
+    },
+
+    {
+      cssText: "#test { color: red; } .test1 { color: blue; } .test2 { display: inline; }",
+      htmlBody: '<p class="test2 test1"></p>',
+      expected: [element("p", inline({ color: "blue" }))],
+    },
   ])(
     "`$cssText` + `$htmlBody` -> $expected (no star)",
     ({ cssText, htmlBody, expected }) => {
