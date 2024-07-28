@@ -28,6 +28,14 @@ export function buildRenderTree(
   );
 }
 
+export function isBlock(renderTreeNode: RenderTreeNode): boolean {
+  if (renderTreeNode.type === "text") {
+    return false;
+  }
+
+  return renderTreeNode.style.get("display") === "block";
+}
+
 function collectStyleRules(
   childNodes: DefaultTreeAdapterMap["childNode"][],
 ): StyleRuleWithSelector[] {
@@ -116,7 +124,9 @@ function matchesSelector(
       return selector.tagName === elementNode.tagName;
     case ".":
       return elementNode.attrs.some(
-        (attr) => attr.name === "class" && attr.value.split(/\s+/).includes(selector.className),
+        (attr) =>
+          attr.name === "class" &&
+          attr.value.split(/\s+/).includes(selector.className),
       );
     case "#":
       return elementNode.attrs.some(
