@@ -36,6 +36,13 @@ export function isBlock(renderTreeNode: RenderTreeNode): boolean {
   return renderTreeNode.style.get("display") === "block";
 }
 
+export function getStyle(renderTreeNode: RenderTreeNode): Map<string, string> {
+  if (renderTreeNode.type === "text") {
+    return new Map(); // Cache with WeakMap if necessary
+  }
+  return renderTreeNode.style;
+}
+
 function collectStyleRules(
   childNodes: DefaultTreeAdapterMap["childNode"][],
 ): StyleRuleWithSelector[] {
