@@ -90,7 +90,7 @@ export default [
     },
   },
   {
-    files: ["*.test.[jt]s"],
+    files: ["**/*.test.[jt]s"],
     rules: {
       "@typescript-eslint/no-null-assertion": "off",
     },
