@@ -28,7 +28,7 @@ export interface EdgeSizes {
   right: number;
 }
 
-interface LayoutBox {
+export interface LayoutBox {
   renderTreeNode: RenderTreeNode;
   dimensions: Dimensions;
   children: LayoutBox[];
@@ -46,7 +46,10 @@ export function buildUnadjustedLayoutBox(
   return {
     renderTreeNode,
     dimensions: emptyDimensions(),
-    children: [],
+    children:
+      renderTreeNode.type === "element"
+        ? renderTreeNode.children.map(buildUnadjustedLayoutBox)
+        : [],
   };
 }
 
