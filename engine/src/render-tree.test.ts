@@ -66,7 +66,8 @@ describe("buildRenderTree", () => {
     },
 
     {
-      cssText: "#test { color: red; } .test1 { color: blue; } .test2 { display: inline; }",
+      cssText:
+        "#test { color: red; } .test1 { color: blue; } .test2 { display: inline; }",
       htmlBody: '<p class="test2 test1"></p>',
       expected: [element("p", inline({ color: "blue" }))],
     },
