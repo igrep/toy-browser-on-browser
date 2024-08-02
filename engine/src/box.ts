@@ -1,4 +1,9 @@
-import { getStyle, isBlock, RenderTreeNode } from "./render-tree";
+import {
+  getStyle,
+  isBlock,
+  RenderTextNode,
+  RenderTreeNode,
+} from "./render-tree";
 
 // Ref. https://limpet.net/mbrubeck/2014/09/08/toy-layout-engine-5-boxes.html
 
@@ -23,79 +28,51 @@ export interface EdgeSizes {
   right: number;
 }
 
-interface LayoutBoxCore {
+interface LayoutBox {
+  renderTreeNode: RenderTreeNode;
   dimensions: Dimensions;
   children: LayoutBox[];
 }
 
-export interface LayoutBlockNode extends LayoutBoxCore {
-  renderTreeNode: RenderTreeNode;
-  isBlock: true;
+export interface Cursor {
+  x: number;
+  y: number;
+  shouldRenderBelow: boolean;
 }
-
-export interface LayoutInlineNode extends LayoutBoxCore {
-  renderTreeNode: RenderTreeNode;
-  isBlock: false;
-}
-
-export interface LayoutAnonymousBlockNode extends LayoutBoxCore {
-  renderTreeNode: null;
-  isBlock: true;
-}
-
-export type LayoutBox =
-  | LayoutBlockNode
-  | LayoutInlineNode
-  | LayoutAnonymousBlockNode;
 
 export function buildUnadjustedLayoutBox(
   renderTreeNode: RenderTreeNode,
 ): LayoutBox {
-  if (renderTreeNode.type === "text") {
-    return {
-      isBlock: false,
-      renderTreeNode,
-      dimensions: emptyDimensions(),
-      children: [],
-    };
-  }
-
-  const root: LayoutBox = {
-    isBlock: renderTreeNode.style.get("display") === "block",
+  return {
     renderTreeNode,
     dimensions: emptyDimensions(),
     children: [],
   };
-
-  for (const child of renderTreeNode.children) {
-    if (isBlock(child)) {
-      root.children.push(buildUnadjustedLayoutBox(child));
-      continue;
-    }
-    getInlineContainer(root).children.push(buildUnadjustedLayoutBox(child));
-  }
-
-  return root;
 }
 
-//// Ref. https://limpet.net/mbrubeck/2014/09/17/toy-layout-engine-6-block.html
-export function layout(layoutRoot: LayoutBox, containingBlock: Box): void {
-  if (isBlockBox(layoutRoot)) {
-    calculateBlockWidth(layoutRoot, containingBlock);
-    calculateBlockPosition(layoutRoot, containingBlock);
-    layoutBlockChildren(layoutRoot);
-    calculateBlockHeight(layoutRoot);
-  }
-  // NOTE: Inline and anonymous block boxes are not supported as the referred page does not.
-}
-
-function calculateBlockWidth(
-  layoutBlock: LayoutBlockNode,
-  containingBlock: Box,
+// Ref. https://github.com/askerry/toy-browser/blob/master/src/layout.cc
+export function layout(
+  layoutRoot: LayoutBox,
+  container: Dimensions,
+  canvasContext: CanvasText,
+  cursor: Cursor = defaultCursor(),
 ): void {
-  const style = getStyle(layoutBlock.renderTreeNode);
+  calculateWidth(layoutRoot, container, canvasContext);
+  calculatePosition(layoutRoot, container, cursor);
+  layoutChildren(
+    layoutRoot,
+    container.content.width - container.padding.left - container.padding.right,
+    canvasContext,
+  );
+  calculateHeight(layoutRoot, canvasContext);
+}
 
-  let width = style.get("width") ?? "auto";
+function calculateWidth(
+  layoutBox: LayoutBox,
+  container: Dimensions,
+  canvasContext: CanvasText,
+): void {
+  const style = getStyle(layoutBox.renderTreeNode);
 
   let marginLeft = style.get("margin-left") ?? style.get("margin") ?? "0";
   let marginRight = style.get("margin-right") ?? style.get("margin") ?? "0";
@@ -110,6 +87,11 @@ function calculateBlockWidth(
   const paddingRight =
     style.get("padding-right-width") ?? style.get("padding-width") ?? "0";
 
+  let width =
+    layoutBox.renderTreeNode.type === "text"
+      ? String(measureTextWidth(layoutBox.renderTreeNode, canvasContext))
+      : (style.get("width") ?? "auto");
+
   const totalWidth =
     (parseFloat(marginLeft) || 0) +
     (parseFloat(borderLeft) || 0) +
@@ -119,7 +101,7 @@ function calculateBlockWidth(
     (parseFloat(borderRight) || 0) +
     (parseFloat(marginRight) || 0);
 
-  if (width !== "auto" && totalWidth > containingBlock.width) {
+  if (width !== "auto" && totalWidth > container.content.width) {
     if (marginLeft === "auto") {
       marginLeft = "0";
     }
@@ -128,13 +110,19 @@ function calculateBlockWidth(
     }
   }
 
-  const underflow = containingBlock.width - totalWidth;
+  const underflow = container.content.width - totalWidth;
 
   let widthI = parseFloat(width);
+  if (
+    layoutBox.renderTreeNode.type === "text" ||
+    !isBlock(layoutBox.renderTreeNode)
+  ) {
+    width = String(totalWidth);
+  }
+
   let marginLeftI = parseFloat(marginLeft);
   let marginRightI = parseFloat(marginRight);
   if (width === "auto") {
-    // (true, _ _)
     if (marginLeft === "auto") {
       marginLeftI = 0;
     }
@@ -151,22 +139,18 @@ function calculateBlockWidth(
   } else {
     if (marginLeft === "auto") {
       if (marginRight === "auto") {
-        // (false, true, true)
         marginLeftI = marginRightI = underflow / 2;
       } else {
-        // (false, true, false)
         marginLeftI = underflow;
       }
     } else if (marginRight === "auto") {
-      // (false, false, true)
       marginRightI = underflow;
     } else {
-      // (false, false, false)
       marginRightI = parseFloat(marginRight) + underflow;
     }
   }
 
-  const d = layoutBlock.dimensions;
+  const d = layoutBox.dimensions;
   d.content.width = widthI;
   d.padding.left = parseFloat(paddingLeft);
   d.padding.right = parseFloat(paddingRight);
@@ -176,12 +160,13 @@ function calculateBlockWidth(
   d.margin.right = marginRightI;
 }
 
-function calculateBlockPosition(
-  layoutBlock: LayoutBlockNode,
-  containingBlock: Box,
+function calculatePosition(
+  layoutBox: LayoutBox,
+  container: Dimensions,
+  { x, y }: Cursor,
 ): void {
-  const style = getStyle(layoutBlock.renderTreeNode);
-  const d = layoutBlock.dimensions;
+  const style = getStyle(layoutBox.renderTreeNode);
+  const d = layoutBox.dimensions;
 
   d.margin.top = parseFloat(
     style.get("margin-top") ?? style.get("margin") ?? "0",
@@ -205,22 +190,102 @@ function calculateBlockPosition(
   );
 
   d.content.x =
-    containingBlock.x + d.margin.left + d.border.left + d.padding.left;
-  d.content.y = containingBlock.y + d.margin.top + d.border.top + d.padding.top;
+    container.content.x + x + d.margin.left + d.border.left + d.padding.left;
+  d.content.y =
+    container.content.y + y + d.margin.top + d.border.top + d.padding.top;
 }
 
-function layoutBlockChildren(layoutBlock: LayoutBlockNode): void {
-  for (const child of layoutBlock.children) {
-    layout(child, layoutBlock.dimensions.content);
-    layoutBlock.dimensions.content.height += marginHeight(child.dimensions);
+function layoutChildren(
+  layoutBox: LayoutBox,
+  parentWidth: number,
+  canvasContext: CanvasText,
+): void {
+  let cursorX = 0;
+  let cursorY = 0;
+  let previousElementIsBlock = false;
+  let previousElementHeight = 0;
+
+  const availableChildWidth = isBlock(layoutBox.renderTreeNode)
+    ? layoutBox.dimensions.content.width
+    : parentWidth;
+
+  for (const child of layoutBox.children) {
+    calculateWidth(child, layoutBox.dimensions, canvasContext);
+
+    const currentElementIsBlock = isBlock(child.renderTreeNode);
+    const overflow =
+      cursorX + child.dimensions.content.width > availableChildWidth;
+    const shouldRenderBelow =
+      previousElementIsBlock || currentElementIsBlock || overflow;
+    if (shouldRenderBelow) {
+      cursorX = 0;
+      cursorY += previousElementHeight;
+    }
+
+    layout(child, layoutBox.dimensions, canvasContext, {
+      x: cursorX,
+      y: cursorY,
+      shouldRenderBelow,
+    });
+
+    if (!isBlock(child.renderTreeNode)) {
+      cursorX += borderBoxWidth(child.dimensions);
+
+      if (
+        !isBlock(layoutBox.renderTreeNode) ||
+        (getStyle(layoutBox.renderTreeNode).get("width") ?? "auto") === "auto"
+      ) {
+        layoutBox.dimensions.content.width += child.dimensions.content.width;
+      }
+    }
+
+    const childMarginBoxHeight = marginBoxHeight(child.dimensions);
+    if (shouldRenderBelow) {
+      layoutBox.dimensions.content.height += childMarginBoxHeight;
+    }
+
+    if (childMarginBoxHeight > layoutBox.dimensions.content.height) {
+      layoutBox.dimensions.content.height = childMarginBoxHeight;
+    }
+    previousElementHeight = childMarginBoxHeight;
+
+    previousElementIsBlock = currentElementIsBlock;
   }
 }
 
-function calculateBlockHeight(layoutBlock: LayoutBlockNode) {
-  const height = getStyle(layoutBlock.renderTreeNode).get("height");
+function calculateHeight(
+  layoutBox: LayoutBox,
+  canvasContext: CanvasText,
+): void {
+  if (layoutBox.renderTreeNode.type === "text") {
+    layoutBox.dimensions.content.height = measureTextHeight(
+      layoutBox.renderTreeNode,
+      canvasContext,
+    );
+    return;
+  }
+
+  const height = getStyle(layoutBox.renderTreeNode).get("height");
   if (height != null && height !== "auto") {
-    layoutBlock.dimensions.content.height = parseFloat(height);
+    layoutBox.dimensions.content.height = parseFloat(height);
   }
+}
+
+function measureTextHeight(
+  renderTreeNode: RenderTextNode,
+  canvasContext: CanvasText,
+): number {
+  const { fontBoundingBoxAscent, fontBoundingBoxDescent } =
+    canvasContext.measureText(renderTreeNode.contents);
+  return fontBoundingBoxAscent + fontBoundingBoxDescent;
+}
+
+function measureTextWidth(
+  renderTreeNode: RenderTextNode,
+  canvasContext: CanvasText,
+): number {
+  const { width } = canvasContext.measureText(renderTreeNode.contents);
+  return width;
 }
 
 function emptyDimensions(): Dimensions {
@@ -250,46 +315,38 @@ function emptyEdges(): EdgeSizes {
   };
 }
 
-function getInlineContainer(root: LayoutBox): LayoutBox {
-  if (isInlineBox(root) || isAnonymousBlockBox(root)) {
-    return root;
-  }
-
-  const lastChild = root.children[root.children.length - 1];
-  if (lastChild == null || !isAnonymousBlockBox(lastChild)) {
-    const anonymousLastChild: LayoutAnonymousBlockNode = {
-      isBlock: true,
-      renderTreeNode: null,
-      dimensions: emptyDimensions(),
-      children: [],
-    };
-    root.children.push(anonymousLastChild);
-    return anonymousLastChild;
-  }
-
-  return lastChild;
+export function defaultCursor(): Cursor {
+  return {
+    x: 0,
+    y: 0,
+    shouldRenderBelow: true,
+  };
 }
 
-function isBlockBox(box: LayoutBox): box is LayoutBlockNode {
-  return box.isBlock && box.renderTreeNode !== null;
+function expandWidth(width: number, { left, right }: EdgeSizes): number {
+  return width + left + right;
 }
 
-function isInlineBox(box: LayoutBox): box is LayoutInlineNode {
-  return !box.isBlock;
+function paddingBoxWidth({ content, padding }: Dimensions): number {
+  return expandWidth(content.width, padding);
 }
 
-function isAnonymousBlockBox(box: LayoutBox): box is LayoutAnonymousBlockNode {
-  return box.renderTreeNode === null;
+function borderBoxWidth(dimensions: Dimensions): number {
+  return expandWidth(paddingBoxWidth(dimensions), dimensions.border);
 }
 
-function marginHeight(dimensions: Dimensions): number {
-  return (
-    dimensions.margin.top +
-    dimensions.border.top +
-    dimensions.padding.top +
-    dimensions.content.height +
-    dimensions.padding.bottom +
-    dimensions.border.bottom +
-    dimensions.margin.bottom
-  );
+function expandHeight(height: number, { top, bottom }: EdgeSizes): number {
+  return height + top + bottom;
+}
+
+function paddingBoxHeight({ content, padding }: Dimensions): number {
+  return expandHeight(content.height, padding);
+}
+
+function borderBoxHeight(dimensions: Dimensions): number {
+  return expandHeight(paddingBoxHeight(dimensions), dimensions.border);
+}
+
+function marginBoxHeight(dimensions: Dimensions) {
+  return expandHeight(borderBoxHeight(dimensions), dimensions.margin);
 }
