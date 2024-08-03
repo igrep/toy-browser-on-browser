@@ -5,15 +5,15 @@ import { parseCss } from "./css";
 export type RenderTreeNode = RenderElementNode | RenderTextNode;
 
 export interface RenderElementNode {
-  type: "element";
-  tagName: string;
-  style: Map<string, string>;
-  children: RenderTreeNode[];
+  readonly type: "element";
+  readonly tagName: string;
+  readonly style: Map<string, string>;
+  readonly children: RenderTreeNode[];
 }
 
 export interface RenderTextNode {
-  type: "text";
-  contents: string;
+  readonly type: "text";
+  readonly contents: string;
 }
 
 export function buildRenderTree(

@@ -1,6 +1,7 @@
 import {
   getStyle,
   isBlock,
+  RenderElementNode,
   RenderTextNode,
   RenderTreeNode,
 } from "./render-tree";
@@ -28,10 +29,18 @@ export interface EdgeSizes {
   right: number;
 }
 
-export interface LayoutBox {
-  renderTreeNode: RenderTreeNode;
-  dimensions: Dimensions;
-  children: LayoutBox[];
+export type LayoutBox = LayoutBoxElement | LayoutBoxText;
+
+export interface LayoutBoxElement {
+  readonly renderTreeNode: RenderElementNode;
+  readonly dimensions: Dimensions;
+  readonly children: LayoutBox[];
+}
+
+export interface LayoutBoxText {
+  readonly renderTreeNode: RenderTextNode;
+  readonly dimensions: Dimensions;
+  readonly children: [];
 }
 
 export interface Cursor {
@@ -43,13 +52,17 @@ export interface Cursor {
 export function buildUnadjustedLayoutBox(
   renderTreeNode: RenderTreeNode,
 ): LayoutBox {
+  if (renderTreeNode.type === "text") {
+    return {
+      renderTreeNode,
+      dimensions: emptyDimensions(),
+      children: [] as const,
+    };
+  }
   return {
     renderTreeNode,
     dimensions: emptyDimensions(),
-    children:
-      renderTreeNode.type === "element"
-        ? renderTreeNode.children.map(buildUnadjustedLayoutBox)
-        : [],
+    children: renderTreeNode.children.map(buildUnadjustedLayoutBox),
   };
 }
 
@@ -352,4 +365,13 @@ function borderBoxHeight(dimensions: Dimensions): number {
 
 function marginBoxHeight(dimensions: Dimensions) {
   return expandHeight(borderBoxHeight(dimensions), dimensions.margin);
+}
+
+export function borderBoxOf(dimensions: Dimensions): Box {
+  return {
+    x: dimensions.content.x - dimensions.border.left - dimensions.padding.left,
+    y: dimensions.content.y - dimensions.border.top - dimensions.padding.top,
+    width: borderBoxWidth(dimensions),
+    height: borderBoxHeight(dimensions),
+  };
 }
