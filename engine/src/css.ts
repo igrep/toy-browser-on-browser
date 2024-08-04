@@ -1,11 +1,11 @@
-import * as cssom from "rrweb-cssom";
+import { parse, CSSRule, CSSStyleRule, CSSStyleDeclaration } from "rrweb-cssom";
 
 export function parseCss(cssText: string): StyleRuleWithSelector[] {
-  const cssomResult = cssom.parse(cssText);
-  if (cssomResult instanceof cssom.CSSStyleSheet) {
+  const cssomResult = parse(cssText);
+  if (cssomResult instanceof CSSStyleSheet) {
     return cssomResult.cssRules.map(
-      (cssRule: cssom.CSSRule): StyleRuleWithSelector => {
-        if (cssRule instanceof cssom.CSSStyleRule) {
+      (cssRule: CSSRule): StyleRuleWithSelector => {
+        if (cssRule instanceof CSSStyleRule) {
           return {
             selectorList: parseSelector(cssRule.selectorText),
             style: cssRule.style,
@@ -83,7 +83,7 @@ export function parseSelector(
 
 export interface StyleRuleWithSelector {
   selectorList: CommaSeparatedSelectorList;
-  style: cssom.CSSStyleDeclaration;
+  style: CSSStyleDeclaration;
 }
 
 export type CommaSeparatedSelectorList = Selector[];

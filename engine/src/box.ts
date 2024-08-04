@@ -304,6 +304,20 @@ function measureTextWidth(
   return width;
 }
 
+export function viewportSizeToContainer({
+  width,
+  height,
+}: {
+  width: number;
+  height: number;
+}): Dimensions {
+  const empty = emptyDimensions();
+  return {
+    ...empty,
+    content: { ...empty.content, width, height },
+  };
+}
+
 function emptyDimensions(): Dimensions {
   return {
     content: emptyBox(),

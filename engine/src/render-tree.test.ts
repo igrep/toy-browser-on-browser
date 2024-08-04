@@ -75,9 +75,9 @@ describe("buildRenderTree", () => {
     "`$cssText` + `$htmlBody` -> $expected (no star)",
     ({ cssText, htmlBody, expected }) => {
       const htmlContents = `<html><head><style>${cssText}</style></head><body>${htmlBody}</body></html>`;
-      expect(buildRenderTree(parse5.parse(htmlContents))).toEqual([
+      expect(buildRenderTree(parse5.parse(htmlContents))).toEqual(
         element("html", block(), [element("body", block(), expected)]),
-      ]);
+      );
     },
   );
 
@@ -102,7 +102,7 @@ describe("buildRenderTree", () => {
     "`$cssText` + `$htmlBody` -> $expected (block star)",
     ({ cssText, htmlBody, expected }) => {
       const htmlContents = `<html><head><style>${cssText}</style></head><body>${htmlBody}</body></html>`;
-      expect(buildRenderTree(parse5.parse(htmlContents))).toEqual([
+      expect(buildRenderTree(parse5.parse(htmlContents))).toEqual(
         element("html", block(), [
           element("head", block(), [
             element("style", block(), [
@@ -114,7 +114,7 @@ describe("buildRenderTree", () => {
           ]),
           element("body", block(), expected),
         ]),
-      ]);
+      );
     },
   );
 
@@ -138,7 +138,7 @@ describe("buildRenderTree", () => {
     "`$cssText` + `$htmlBody` -> $expected (inline star)",
     ({ cssText, htmlBody, expected }) => {
       const htmlContents = `<html><head><style>${cssText}</style></head><body>${htmlBody}</body></html>`;
-      expect(buildRenderTree(parse5.parse(htmlContents))).toEqual([
+      expect(buildRenderTree(parse5.parse(htmlContents))).toEqual(
         element("html", inline(), [
           element("head", inline(), [
             element("style", inline(), [
@@ -150,7 +150,7 @@ describe("buildRenderTree", () => {
           ]),
           element("body", inline(), expected),
         ]),
-      ]);
+      );
     },
   );
 });

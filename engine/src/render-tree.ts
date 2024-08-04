@@ -18,14 +18,18 @@ export interface RenderTextNode {
 
 export function buildRenderTree(
   doc: DefaultTreeAdapterMap["document"],
-): RenderTreeNode[] {
+): RenderTreeNode | undefined {
   const { childNodes } = doc;
   const styleRules = collectStyleRules(childNodes);
 
-  return childNodes.flatMap(
+  const result = childNodes.flatMap(
     (child: DefaultTreeAdapterMap["childNode"]): RenderTreeNode[] =>
       applyStyleRules(child, styleRules),
   );
+  if (result.length > 1) {
+    console.warn("Multiple root elements found in the document");
+  }
+  return result[0];
 }
 
 export function isBlock(renderTreeNode: RenderTreeNode): boolean {

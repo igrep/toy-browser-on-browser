@@ -1,13 +1,22 @@
-export type ToEngineMessage = VisitPage;
+export type ToEngineMessage = CanvasReady | VisitPage;
+
+export interface CanvasReady {
+  type: "CanvasReady";
+  canvas: OffscreenCanvas;
+}
 
 export interface VisitPage {
   type: "VisitPage";
   url: string;
 }
 
-export type FromEngineMessage = UpdateStatus;
+export type FromEngineMessage = StartLoading | FinishLoading;
 
-export interface UpdateStatus {
-  type: "UpdateStatus";
-  status: "startLoading" | "finishLoading";
+export interface StartLoading {
+  type: "StartLoading";
+}
+
+export interface FinishLoading {
+  type: "FinishLoading";
+  loadedDocument: string;
 }
