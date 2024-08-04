@@ -1,8 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
-import type { Engine } from '@igrep/toy-browser-on-browser-engine/src/to-chrome-facade';
+import { useState, useEffect, useCallback } from "react";
+import type { Engine } from "@igrep/toy-browser-on-browser-engine/src/to-chrome-facade";
 
 export function StatusIndicator({ engine }: { engine: Engine }) {
-  const [status, setStatus] = useState<"StartLoading" | "FinishLoading" | null>(null);
+  const [status, setStatus] = useState<"StartLoading" | "FinishLoading" | null>(
+    null,
+  );
   let message = "";
   switch (status) {
     case "StartLoading":
