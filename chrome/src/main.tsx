@@ -5,6 +5,7 @@ import "./index.css";
 
 import { Engine } from "@igrep/toy-browser-on-browser-engine/src/to-chrome-facade.ts";
 
+console.log("starting worker");
 const worker = new Worker(
   new URL("../../engine/src/index.ts", import.meta.url),
   {
@@ -12,6 +13,7 @@ const worker = new Worker(
     name: "web-worker",
   },
 );
+console.log("started worker");
 const engine = new Engine(worker);
 
 ReactDOM.createRoot(document.body.firstElementChild!).render(

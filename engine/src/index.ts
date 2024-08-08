@@ -8,6 +8,7 @@ const LOAD_TIME_MILLISEC = 3000;
 
 let canvas: OffscreenCanvas | null = null;
 
+console.log("Worker is ready");
 addEventListener("message", async (e): Promise<void> => {
   console.debug("Worker received", e.data);
   switch (e.data.type) {
