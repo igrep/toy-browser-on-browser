@@ -3,7 +3,7 @@
 set -u
 
 set +e
-jsFiles=($(git diff --cached --name-only --diff-filter=ACMR | grep -Ee '\.ts$'))
+jsFiles=($(git diff --cached --name-only --diff-filter=ACMR | grep -Ee '\.tsx{0,1}$'))
 set -e
 
 existingJsFiles=()
