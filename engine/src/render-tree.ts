@@ -173,6 +173,9 @@ function matchesSelector(
   }
 }
 
+// Some of them are extracted from https://searchfox.org/mozilla-central/source/layout/style/res/html.css
+// then translated non-supported rules to supported ones
+// Ref. https://www.nda.co.jp/memo/pxpt.html
 const defaultRules: StyleRuleWithSelector[] = parseCss(`
 * {
   display: block;
@@ -180,7 +183,69 @@ const defaultRules: StyleRuleWithSelector[] = parseCss(`
 head {
   display: none;
 }
+style {
+  display: none;
+}
 span {
   display: inline;
+}
+
+body {
+  display: block;
+  margin: 8px;
+}
+
+p, dl {
+  display: block;
+  margin-left: 16;
+  margin-right: 16;
+}
+
+dd {
+  display: block;
+  margin-left: 40px;
+}
+
+blockquote, figure {
+  display: block;
+  margin-block: 16;
+}
+
+address {
+  display: block;
+}
+
+center {
+  display: block;
+}
+
+h1 {
+  display: block;
+  margin: 26;
+}
+
+h2 {
+  display: block;
+  margin: 19;
+}
+
+h3 {
+  display: block;
+  margin: 19;
+}
+
+h4 {
+  display: block;
+  margin: 21.5;
+}
+
+h5 {
+  display: block;
+  margin-block: 22;
+}
+
+h6 {
+  display: block;
+  margin: 24;
 }
 `);
