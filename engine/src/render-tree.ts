@@ -192,7 +192,7 @@ span {
 
 body {
   display: block;
-  margin: 8px;
+  margin: 8;
 }
 
 p, dl {
