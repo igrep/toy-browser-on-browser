@@ -18,7 +18,7 @@ export function NativeIframeLoader({ engine }: { engine: Engine }) {
 
   return (
     <details onToggle={onToggle} open={open}>
-      <summary>Compare with how Your Browser renders</summary>
+      <summary>Compare with how your browser renders</summary>
       {!open || path == null ? (
         "No Page Opened Yet"
       ) : (
