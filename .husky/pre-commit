@@ -15,5 +15,10 @@ done
 
 if [ "${#existingJsFiles[@]}" -ne 0 ]; then
   npx eslint --fix -- "${existingJsFiles[@]}"
+  set +e
+  npx prettier --check -- "${existingJsFiles[@]}"
+  prettierExitCode="$?"
+  set -e
   npx prettier --write -- "${existingJsFiles[@]}"
+  exit "$prettierExitCode"
 fi
