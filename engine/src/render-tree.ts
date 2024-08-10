@@ -87,6 +87,11 @@ function applyStyleRules(
       },
     ];
   }
+
+  if (element.nodeName.startsWith("#")) {
+    return [];
+  }
+
   const elementNode = element as DefaultTreeAdapterMap["element"];
   const matchingStyleRules = [...defaultRules, ...styleRules].filter(
     (styleRule: StyleRuleWithSelector): boolean =>
