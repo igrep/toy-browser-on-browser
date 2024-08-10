@@ -80,10 +80,17 @@ function applyStyleRules(
   styleRules: StyleRuleWithSelector[],
 ): RenderTreeNode[] {
   if (element.nodeName === "#text") {
+    const contents = (
+      element as DefaultTreeAdapterMap["textNode"]
+    ).value.trim();
+    if (contents === "") {
+      // I'm not sure if this is the right behavior, but this helps to reduce debug logs.
+      return [];
+    }
     return [
       {
         type: "text",
-        contents: (element as DefaultTreeAdapterMap["textNode"]).value,
+        contents,
       },
     ];
   }

@@ -32,8 +32,8 @@ export function displayDomOnCanvas(
     console.info("Empty render tree", dom);
     return;
   }
-  const layoutBox = buildUnadjustedLayoutBox(renderTree);
-  layout(layoutBox, viewportSizeToContainer(canvas), context);
+  const layoutBox = buildUnadjustedLayoutBox(renderTree, context);
+  layout(layoutBox, viewportSizeToContainer(canvas));
   const paintCommands = buildPaintCommands(layoutBox);
   for (const command of paintCommands) {
     runPaintCommandOn(command, context);

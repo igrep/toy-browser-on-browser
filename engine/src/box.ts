@@ -41,6 +41,7 @@ export interface LayoutBoxText {
   readonly renderTreeNode: RenderTextNode;
   readonly dimensions: Dimensions;
   readonly children: [];
+  readonly textMetrics: TextMetrics;
 }
 
 export interface Cursor {
@@ -51,18 +52,22 @@ export interface Cursor {
 
 export function buildUnadjustedLayoutBox(
   renderTreeNode: RenderTreeNode,
+  canvasContext: CanvasText,
 ): LayoutBox {
   if (renderTreeNode.type === "text") {
     return {
       renderTreeNode,
       dimensions: emptyDimensions(),
       children: [] as const,
+      textMetrics: canvasContext.measureText(renderTreeNode.contents),
     };
   }
   return {
     renderTreeNode,
     dimensions: emptyDimensions(),
-    children: renderTreeNode.children.map(buildUnadjustedLayoutBox),
+    children: renderTreeNode.children.map((child) =>
+      buildUnadjustedLayoutBox(child, canvasContext),
+    ),
   };
 }
 
@@ -70,24 +75,18 @@ export function buildUnadjustedLayoutBox(
 export function layout(
   layoutRoot: LayoutBox,
   container: Dimensions,
-  canvasContext: CanvasText,
   cursor: Cursor = defaultCursor(),
 ): void {
-  calculateWidth(layoutRoot, container, canvasContext);
+  calculateWidth(layoutRoot, container);
   calculatePosition(layoutRoot, container, cursor);
   layoutChildren(
     layoutRoot,
     container.content.width - container.padding.left - container.padding.right,
-    canvasContext,
   );
-  calculateHeight(layoutRoot, canvasContext);
+  calculateHeight(layoutRoot);
 }
 
-function calculateWidth(
-  layoutBox: LayoutBox,
-  container: Dimensions,
-  canvasContext: CanvasText,
-): void {
+function calculateWidth(layoutBox: LayoutBox, container: Dimensions): void {
   const style = getStyle(layoutBox.renderTreeNode);
 
   let marginLeft = style.get("margin-left") ?? style.get("margin") ?? "0";
@@ -105,7 +104,7 @@ function calculateWidth(
 
   let width =
     layoutBox.renderTreeNode.type === "text"
-      ? String(measureTextWidth(layoutBox.renderTreeNode, canvasContext))
+      ? String(measureTextWidth(layoutBox as LayoutBoxText))
       : (style.get("width") ?? "auto");
 
   const totalWidth =
@@ -211,11 +210,7 @@ function calculatePosition(
     container.content.y + y + d.margin.top + d.border.top + d.padding.top;
 }
 
-function layoutChildren(
-  layoutBox: LayoutBox,
-  parentWidth: number,
-  canvasContext: CanvasText,
-): void {
+function layoutChildren(layoutBox: LayoutBox, parentWidth: number): void {
   let cursorX = 0;
   let cursorY = 0;
   let previousElementIsBlock = false;
@@ -226,7 +221,7 @@ function layoutChildren(
     : parentWidth;
 
   for (const child of layoutBox.children) {
-    calculateWidth(child, layoutBox.dimensions, canvasContext);
+    calculateWidth(child, layoutBox.dimensions);
 
     const currentElementIsBlock = isBlock(child.renderTreeNode);
     const overflow =
@@ -238,7 +233,7 @@ function layoutChildren(
       cursorY += previousElementHeight;
     }
 
-    layout(child, layoutBox.dimensions, canvasContext, {
+    layout(child, layoutBox.dimensions, {
       x: cursorX,
       y: cursorY,
       shouldRenderBelow,
@@ -269,14 +264,10 @@ function layoutChildren(
   }
 }
 
-function calculateHeight(
-  layoutBox: LayoutBox,
-  canvasContext: CanvasText,
-): void {
+function calculateHeight(layoutBox: LayoutBox): void {
   if (layoutBox.renderTreeNode.type === "text") {
     layoutBox.dimensions.content.height = measureTextHeight(
-      layoutBox.renderTreeNode,
-      canvasContext,
+      layoutBox as LayoutBoxText,
     );
     return;
   }
@@ -287,20 +278,14 @@ function calculateHeight(
   }
 }
 
-function measureTextHeight(
-  renderTreeNode: RenderTextNode,
-  canvasContext: CanvasText,
-): number {
+function measureTextHeight(layoutBox: LayoutBoxText): number {
   const { fontBoundingBoxAscent, fontBoundingBoxDescent } =
-    canvasContext.measureText(renderTreeNode.contents);
+    layoutBox.textMetrics;
   return fontBoundingBoxAscent + fontBoundingBoxDescent;
 }
 
-function measureTextWidth(
-  renderTreeNode: RenderTextNode,
-  canvasContext: CanvasText,
-): number {
-  const { width } = canvasContext.measureText(renderTreeNode.contents);
+function measureTextWidth(layoutBox: LayoutBoxText): number {
+  const { width } = layoutBox.textMetrics;
   return width;
 }
 

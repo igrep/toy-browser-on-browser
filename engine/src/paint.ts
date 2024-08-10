@@ -154,7 +154,9 @@ function addPaintText(
   commands.push({
     type: "text",
     x: layoutRoot.dimensions.content.x,
-    y: layoutRoot.dimensions.content.y,
+    y:
+      layoutRoot.dimensions.content.y +
+      layoutRoot.textMetrics.fontBoundingBoxAscent,
     text: layoutRoot.renderTreeNode.contents,
     color,
   });
