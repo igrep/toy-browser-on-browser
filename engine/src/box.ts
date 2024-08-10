@@ -127,13 +127,13 @@ function calculateWidth(layoutBox: LayoutBox, container: Dimensions): void {
 
   const underflow = container.content.width - totalWidth;
 
-  let widthI = parseFloat(width);
   if (
     layoutBox.renderTreeNode.type === "text" ||
     !isBlock(layoutBox.renderTreeNode)
   ) {
     width = String(totalWidth);
   }
+  let widthI = parseFloat(width);
 
   let marginLeftI = parseFloat(marginLeft);
   let marginRightI = parseFloat(marginRight);
