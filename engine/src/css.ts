@@ -42,7 +42,7 @@ export function parseSelector(
             className: simpleSelectorText.slice(1),
           };
         default: {
-          const tagNameMd = simpleSelectorText.match(/^[a-zA-Z]+/);
+          const tagNameMd = simpleSelectorText.match(/^[a-zA-Z]\w*/);
           if (tagNameMd == null) {
             throw new Error(
               `Invalid selector: ${JSON.stringify(simpleSelectorText)}`,
