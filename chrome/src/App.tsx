@@ -45,6 +45,7 @@ function App({ engine }: { engine: Engine }) {
         )}
       ></canvas>
       <StatusIndicator engine={engine} />
+      <div style={{ height: "1rem" }}></div>
       <NativeIframeLoader engine={engine} />
     </>
   );
