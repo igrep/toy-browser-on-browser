@@ -4,8 +4,6 @@ import type { VisitPage } from "./message";
 import { sendMessage } from "./to-engine-facade";
 import { displayDomOnCanvas, parseToyBrowserProtocol } from "./core";
 
-const LOAD_TIME_MILLISEC = 3000;
-
 let canvas: OffscreenCanvas | null = null;
 
 console.log("Worker is ready");
@@ -21,10 +19,8 @@ addEventListener("message", async (e): Promise<void> => {
         return;
       }
 
-      await new Promise((resolve) => setTimeout(resolve, LOAD_TIME_MILLISEC));
       sendMessage({ type: "StartLoading" });
 
-      await new Promise((resolve) => setTimeout(resolve, LOAD_TIME_MILLISEC));
       const { url } = e.data as VisitPage;
       const path = parseToyBrowserProtocol(url);
       console.debug("Fetching", path);
