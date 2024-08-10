@@ -36,7 +36,7 @@ describe("buildRenderTree", () => {
       cssText: "",
       htmlBody: '<p id="test"></p>',
       expected: [
-        element("p", block({ "margin-left": "16", "margin-right": "16" })),
+        element("p", block({ "margin-top": "16", "margin-bottom": "16" })),
       ],
     },
     {
@@ -49,7 +49,7 @@ describe("buildRenderTree", () => {
       htmlBody: '<div class="test"><p class="test"></p></div>',
       expected: [
         element("div", block(), [
-          element("p", inline({ "margin-left": "16", "margin-right": "16" })),
+          element("p", inline({ "margin-top": "16", "margin-bottom": "16" })),
         ]),
       ],
     },
@@ -71,7 +71,7 @@ describe("buildRenderTree", () => {
       expected: [
         element(
           "p",
-          block({ color: "red", "margin-left": "16", "margin-right": "16" }),
+          block({ color: "red", "margin-top": "16", "margin-bottom": "16" }),
         ),
       ],
     },
@@ -83,7 +83,7 @@ describe("buildRenderTree", () => {
       expected: [
         element(
           "p",
-          inline({ color: "blue", "margin-left": "16", "margin-right": "16" }),
+          inline({ color: "blue", "margin-top": "16", "margin-bottom": "16" }),
         ),
       ],
     },
@@ -104,7 +104,7 @@ describe("buildRenderTree", () => {
       cssText: "* { display: block; } div { display: inline; }",
       htmlBody: '<p id="test"></p>',
       expected: [
-        element("p", block({ "margin-left": "16", "margin-right": "16" })),
+        element("p", block({ "margin-top": "16", "margin-bottom": "16" })),
       ],
     },
     {
@@ -113,7 +113,7 @@ describe("buildRenderTree", () => {
       expected: [
         element(
           "p",
-          inline({ color: "red", "margin-left": "16", "margin-right": "16" }),
+          inline({ color: "red", "margin-top": "16", "margin-bottom": "16" }),
         ),
       ],
     },
@@ -148,14 +148,14 @@ describe("buildRenderTree", () => {
       cssText: "* { display: inline; }",
       htmlBody: '<p id="test"></p>',
       expected: [
-        element("p", inline({ "margin-left": "16", "margin-right": "16" })),
+        element("p", inline({ "margin-top": "16", "margin-bottom": "16" })),
       ],
     },
     {
       cssText: "* { display: inline; } p[id=hello] { color: red; }",
       htmlBody: '<p id="test"></p>',
       expected: [
-        element("p", inline({ "margin-left": "16", "margin-right": "16" })),
+        element("p", inline({ "margin-top": "16", "margin-bottom": "16" })),
       ],
     },
     {
@@ -164,7 +164,7 @@ describe("buildRenderTree", () => {
       expected: [
         element(
           "p",
-          inline({ color: "red", "margin-left": "16", "margin-right": "16" }),
+          inline({ color: "red", "margin-top": "16", "margin-bottom": "16" }),
         ),
       ],
     },

@@ -204,8 +204,8 @@ body {
 
 p, dl {
   display: block;
-  margin-left: 16;
-  margin-right: 16;
+  margin-top: 16;
+  margin-bottom: 16;
 }
 
 dd {
