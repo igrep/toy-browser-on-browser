@@ -1,5 +1,4 @@
 import { useRef, useEffect, useCallback } from "react";
-import "./App.css";
 import type { Engine } from "@igrep/toy-browser-on-browser-engine/src/to-chrome-facade";
 import { StatusIndicator } from "./StatusIndicator";
 
@@ -20,7 +19,7 @@ function App({ engine }: { engine: Engine }) {
 
   return (
     <>
-      <label>
+      <label style={{ display: "block", paddingBottom: "0.5rem" }}>
         {"URL: "}
         <select onChange={onChange} ref={addressBarRef}>
           <option>{BLANK_PAGE_URL}</option>
@@ -31,6 +30,7 @@ function App({ engine }: { engine: Engine }) {
       <canvas
         width={800}
         height={600}
+        style={{ border: "1px solid black" }}
         ref={useCallback(
           (canvas: HTMLCanvasElement) => {
             if (canvas == null) {
