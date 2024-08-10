@@ -6,9 +6,7 @@ import { displayDomOnCanvas, parseToyBrowserProtocol } from "./core";
 
 let canvas: OffscreenCanvas | null = null;
 
-console.log("Worker is ready");
 addEventListener("message", async (e): Promise<void> => {
-  console.debug("Worker received", e.data);
   switch (e.data.type) {
     case "CanvasReady":
       canvas = (e.data as { canvas: OffscreenCanvas }).canvas;
@@ -23,7 +21,6 @@ addEventListener("message", async (e): Promise<void> => {
       const path = parseToyBrowserProtocol(url);
       sendMessage({ type: "StartLoading", path });
 
-      console.debug("Fetching", path);
       const res = await fetch(path);
       // This must be false positive
       // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions

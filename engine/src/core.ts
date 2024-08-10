@@ -29,7 +29,7 @@ export function displayDomOnCanvas(
   //  call buildRenderTree, buildUnadjustedLayoutBox, layout, buildPaintCommands, and runPaintCommandOn.
   const renderTree = buildRenderTree(dom);
   if (renderTree == null) {
-    console.log("Empty render tree", dom);
+    console.info("Empty render tree", dom);
     return;
   }
   const layoutBox = buildUnadjustedLayoutBox(renderTree);
