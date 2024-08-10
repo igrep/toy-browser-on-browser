@@ -1,5 +1,9 @@
-import { useState, useEffect, useCallback } from "react";
-import type { Engine } from "@igrep/toy-browser-on-browser-engine/src/to-chrome-facade";
+import { useState, useCallback } from "react";
+import {
+  useOnFinishLoading,
+  useOnStartLoading,
+  type Engine,
+} from "@igrep/toy-browser-on-browser-engine/src/to-chrome-facade";
 
 export function StatusIndicator({ engine }: { engine: Engine }) {
   const [status, setStatus] = useState<"StartLoading" | "FinishLoading" | null>(
@@ -15,21 +19,15 @@ export function StatusIndicator({ engine }: { engine: Engine }) {
       break;
   }
 
-  const onStartLoading = useCallback(() => {
+  const onStartLoading = useCallback((_path: string) => {
     setStatus("StartLoading");
   }, []);
+  useOnStartLoading(engine, onStartLoading);
+
   const onFinishLoading = useCallback((_loadedDocument: string) => {
     setStatus("FinishLoading");
   }, []);
-
-  useEffect(() => {
-    engine.onStartLoading(onStartLoading);
-    engine.onFinishLoading(onFinishLoading);
-    return () => {
-      engine.removeOnStartLoading(onStartLoading);
-      engine.removeOnFinishLoading(onFinishLoading);
-    };
-  }, [engine, onStartLoading, onFinishLoading]);
+  useOnFinishLoading(engine, onFinishLoading);
 
   return <div>{message}</div>;
 }

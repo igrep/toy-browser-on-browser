@@ -14,6 +14,7 @@ export type FromEngineMessage = StartLoading | FinishLoading;
 
 export interface StartLoading {
   type: "StartLoading";
+  path: string;
 }
 
 export interface FinishLoading {

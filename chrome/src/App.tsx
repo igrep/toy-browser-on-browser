@@ -1,6 +1,8 @@
 import { useRef, useEffect, useCallback } from "react";
 import type { Engine } from "@igrep/toy-browser-on-browser-engine/src/to-chrome-facade";
 import { StatusIndicator } from "./StatusIndicator";
+import { NativeIframeLoader } from "./NativeIframeLoader";
+import { PAGE_HEIGHT, PAGE_WIDTH } from "./contants";
 
 const BLANK_PAGE_URL = "toy-browser://blank";
 
@@ -28,8 +30,8 @@ function App({ engine }: { engine: Engine }) {
         </select>
       </label>
       <canvas
-        width={800}
-        height={600}
+        width={PAGE_WIDTH}
+        height={PAGE_HEIGHT}
         style={{ border: "1px solid black" }}
         ref={useCallback(
           (canvas: HTMLCanvasElement) => {
@@ -43,6 +45,7 @@ function App({ engine }: { engine: Engine }) {
         )}
       ></canvas>
       <StatusIndicator engine={engine} />
+      <NativeIframeLoader engine={engine} />
     </>
   );
 }

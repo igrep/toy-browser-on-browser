@@ -1,13 +1,15 @@
+import { useEffect } from "react";
 import type {
   CanvasReady,
   FromEngineMessage,
   VisitPage,
   FinishLoading,
+  StartLoading,
 } from "./message";
 
 export class Engine {
   #worker: Worker;
-  #onStartLoading: Set<() => void> = new Set();
+  #onStartLoading: Set<(path: string) => void> = new Set();
   #onFinishLoading: Set<(loadedDocument: string) => void> = new Set();
 
   constructor(worker: Worker) {
@@ -18,7 +20,7 @@ export class Engine {
       switch (message.type) {
         case "StartLoading":
           for (const callback of this.#onStartLoading) {
-            callback();
+            callback((message as StartLoading).path);
           }
           break;
         case "FinishLoading":
@@ -44,11 +46,11 @@ export class Engine {
     this.#worker.postMessage({ type: "VisitPage", url } satisfies VisitPage);
   }
 
-  onStartLoading(callback: () => void): void {
+  onStartLoading(callback: (path: string) => void): void {
     this.#onStartLoading.add(callback);
   }
 
-  removeOnStartLoading(callback: () => void): void {
+  removeOnStartLoading(callback: (path: string) => void): void {
     this.#onStartLoading.delete(callback);
   }
 
@@ -63,4 +65,28 @@ export class Engine {
   terminate(): void {
     this.#worker.terminate();
   }
+}
+
+export function useOnStartLoading(
+  engine: Engine,
+  callback: (path: string) => void,
+): void {
+  useEffect(() => {
+    engine.onStartLoading(callback);
+    return () => {
+      engine.removeOnStartLoading(callback);
+    };
+  }, [engine, callback]);
+}
+
+export function useOnFinishLoading(
+  engine: Engine,
+  callback: (loadedDocument: string) => void,
+): void {
+  useEffect(() => {
+    engine.onFinishLoading(callback);
+    return () => {
+      engine.removeOnFinishLoading(callback);
+    };
+  }, [engine, callback]);
 }

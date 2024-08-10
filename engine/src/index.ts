@@ -19,10 +19,10 @@ addEventListener("message", async (e): Promise<void> => {
         return;
       }
 
-      sendMessage({ type: "StartLoading" });
-
       const { url } = e.data as VisitPage;
       const path = parseToyBrowserProtocol(url);
+      sendMessage({ type: "StartLoading", path });
+
       console.debug("Fetching", path);
       const res = await fetch(path);
       // This must be false positive

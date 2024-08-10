@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "parse5": "^7.1.2",
+    "@types/react": "^18.3.3",
     "rrweb-cssom": "file:../CSSOM"
   }
 }
