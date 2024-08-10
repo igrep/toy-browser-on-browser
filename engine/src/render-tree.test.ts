@@ -35,7 +35,9 @@ describe("buildRenderTree", () => {
     {
       cssText: "",
       htmlBody: '<p id="test"></p>',
-      expected: [element("p", block({ "margin-left": "16", "margin-right": "16" }))],
+      expected: [
+        element("p", block({ "margin-left": "16", "margin-right": "16" })),
+      ],
     },
     {
       cssText: "div { display: block; }",
@@ -45,7 +47,11 @@ describe("buildRenderTree", () => {
     {
       cssText: "p { display: inline; }",
       htmlBody: '<div class="test"><p class="test"></p></div>',
-      expected: [element("div", block(), [element("p", inline({ "margin-left": "16", "margin-right": "16" }))])],
+      expected: [
+        element("div", block(), [
+          element("p", inline({ "margin-left": "16", "margin-right": "16" })),
+        ]),
+      ],
     },
 
     {
@@ -62,21 +68,33 @@ describe("buildRenderTree", () => {
     {
       cssText: "#test { color: red; } .test { color: blue; }",
       htmlBody: '<p id="test"></p>',
-      expected: [element("p", block({ color: "red", "margin-left": "16", "margin-right": "16" }))],
+      expected: [
+        element(
+          "p",
+          block({ color: "red", "margin-left": "16", "margin-right": "16" }),
+        ),
+      ],
     },
 
     {
       cssText:
         "#test { color: red; } .test1 { color: blue; } .test2 { display: inline; }",
       htmlBody: '<p class="test2 test1"></p>',
-      expected: [element("p", inline({ color: "blue", "margin-left": "16", "margin-right": "16" }))],
+      expected: [
+        element(
+          "p",
+          inline({ color: "blue", "margin-left": "16", "margin-right": "16" }),
+        ),
+      ],
     },
   ])(
     "`$cssText` + `$htmlBody` -> $expected (no star)",
     ({ cssText, htmlBody, expected }) => {
       const htmlContents = `<html><head><style>${cssText}</style></head><body>${htmlBody}</body></html>`;
       expect(buildRenderTree(parse5.parse(htmlContents))).toEqual(
-        element("html", block(), [element("body", block({ margin: "8" }), expected)]),
+        element("html", block(), [
+          element("body", block({ margin: "8" }), expected),
+        ]),
       );
     },
   );
@@ -85,12 +103,19 @@ describe("buildRenderTree", () => {
     {
       cssText: "* { display: block; } div { display: inline; }",
       htmlBody: '<p id="test"></p>',
-      expected: [element("p", block({ "margin-left": "16", "margin-right": "16" }))],
+      expected: [
+        element("p", block({ "margin-left": "16", "margin-right": "16" })),
+      ],
     },
     {
       cssText: "* { display: block; } p { display: inline; color: red; }",
       htmlBody: '<p id="test"></p>',
-      expected: [element("p", inline({ color: "red", "margin-left": "16", "margin-right": "16" }))],
+      expected: [
+        element(
+          "p",
+          inline({ color: "red", "margin-left": "16", "margin-right": "16" }),
+        ),
+      ],
     },
 
     {
@@ -122,17 +147,26 @@ describe("buildRenderTree", () => {
     {
       cssText: "* { display: inline; }",
       htmlBody: '<p id="test"></p>',
-      expected: [element("p", inline({ "margin-left": "16", "margin-right": "16" }))],
+      expected: [
+        element("p", inline({ "margin-left": "16", "margin-right": "16" })),
+      ],
     },
     {
       cssText: "* { display: inline; } p[id=hello] { color: red; }",
       htmlBody: '<p id="test"></p>',
-      expected: [element("p", inline({ "margin-left": "16", "margin-right": "16" }))],
+      expected: [
+        element("p", inline({ "margin-left": "16", "margin-right": "16" })),
+      ],
     },
     {
       cssText: "* { display: inline; } p[id=test] { color: red; }",
       htmlBody: '<p id="test"></p>',
-      expected: [element("p", inline({ color: "red", "margin-left": "16", "margin-right": "16" }))],
+      expected: [
+        element(
+          "p",
+          inline({ color: "red", "margin-left": "16", "margin-right": "16" }),
+        ),
+      ],
     },
   ])(
     "`$cssText` + `$htmlBody` -> $expected (inline star)",
