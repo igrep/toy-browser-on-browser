@@ -16,5 +16,4 @@ done
 if [ "${#existingJsFiles[@]}" -ne 0 ]; then
   npx eslint --fix -- "${existingJsFiles[@]}"
   npx prettier --write -- "${existingJsFiles[@]}"
-  git add -- "${existingJsFiles[@]}"
 fi
