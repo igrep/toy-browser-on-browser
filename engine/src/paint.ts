@@ -87,65 +87,76 @@ function addPaintBorders(
   commands: PaintCommand[],
   layoutRoot: LayoutBoxElement,
 ): void {
-  const color =
-    layoutRoot.renderTreeNode.style.get("border-color") ??
-    getCurrentColor(layoutRoot.renderTreeNode);
-  if (color == null) {
+  const borderStyleDefault = validateBorderStyle(
+    layoutRoot.renderTreeNode.style.get("border-style") ?? "none",
+  );
+  if (borderStyleDefault === "none") {
     return;
   }
 
-  const widthStr = layoutRoot.renderTreeNode.style.get("border-width");
-  if (widthStr == null) {
+  const colorDefault =
+    layoutRoot.renderTreeNode.style.get("border-color") ??
+    getCurrentColor(layoutRoot.renderTreeNode);
+
+  const widthStrDefault = layoutRoot.renderTreeNode.style.get("border-width");
+  if (widthStrDefault == null) {
     return;
   }
-  const width = parseFloat(widthStr);
-  if (isNaN(width) || width <= 0) {
+  const widthDefault = parseFloat(widthStrDefault);
+  if (isNaN(widthDefault) || widthDefault <= 0) {
     return;
   }
 
   const { x, y, width: boxWidth, height } = borderBoxOf(layoutRoot.dimensions);
-  commands.push(
-    {
-      // top
+
+  const addBorder = (
+    direction: "top" | "right" | "bottom" | "left",
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number,
+  ): void => {
+    const borderStyle = validateBorderStyle(
+      layoutRoot.renderTreeNode.style.get(`border-${direction}-style`) ??
+        borderStyleDefault,
+    );
+    if (borderStyle === "none") {
+      return;
+    }
+    const widthStr =
+      layoutRoot.renderTreeNode.style.get(`border-${direction}-width`) ??
+      widthStrDefault;
+    const width = parseFloat(widthStr);
+    if (isNaN(width) || width <= 0) {
+      return;
+    }
+    const color =
+      layoutRoot.renderTreeNode.style.get(`border-${direction}-color`) ??
+      colorDefault;
+
+    commands.push({
       type: "line",
       color,
       width,
-      x1: x,
-      y1: y,
-      x2: x + boxWidth,
-      y2: y,
-    },
-    {
-      // right
-      type: "line",
-      color,
-      width,
-      x1: x + boxWidth,
-      y1: y,
-      x2: x + boxWidth,
-      y2: y + height,
-    },
-    {
-      // bottom
-      type: "line",
-      color,
-      width,
-      x1: x + boxWidth,
-      y1: y + height,
-      x2: x,
-      y2: y + height,
-    },
-    {
-      // left
-      type: "line",
-      color,
-      width,
-      x1: x,
-      y1: y + height,
-      x2: x,
-      y2: y,
-    },
-  );
+      x1,
+      y1,
+      x2,
+      y2,
+    });
+  };
+
+  addBorder("top", x, y, x + boxWidth, y);
+  addBorder("right", x + boxWidth, y, x + boxWidth, y + height);
+  addBorder("bottom", x, y + height, x + boxWidth, y + height);
+  addBorder("left", x, y, x, y + height);
+}
+
+function validateBorderStyle(borderStyle: string): "none" | "solid" {
+  if (borderStyle !== "none" && borderStyle !== "solid") {
+    console.error(`Unsupported border style: ${borderStyle}`);
+    return "none";
+  }
+  return borderStyle;
 }
 
 function addPaintText(
