@@ -8,6 +8,7 @@ import {
   type LayoutBox,
   type LayoutBoxElement,
 } from "./box";
+import { getCurrentColor } from "./render-tree";
 
 // Pair of CanvasRenderingContext2D's method and its arguments.
 export type PaintCommand = PaintLine | PaintRect | PaintText;
@@ -86,7 +87,9 @@ function addPaintBorders(
   commands: PaintCommand[],
   layoutRoot: LayoutBoxElement,
 ): void {
-  const color = layoutRoot.renderTreeNode.style.get("border-color");
+  const color =
+    layoutRoot.renderTreeNode.style.get("border-color") ??
+    getCurrentColor(layoutRoot.renderTreeNode);
   if (color == null) {
     return;
   }
@@ -150,7 +153,7 @@ function addPaintText(
   layoutRoot: LayoutBoxText,
   parent: LayoutBoxElement,
 ): void {
-  const color = parent.renderTreeNode.style.get("color") ?? "black";
+  const color = getCurrentColor(parent.renderTreeNode);
   commands.push({
     type: "text",
     x: layoutRoot.dimensions.content.x,

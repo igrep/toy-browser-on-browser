@@ -47,6 +47,10 @@ export function getStyle(renderTreeNode: RenderTreeNode): Map<string, string> {
   return renderTreeNode.style;
 }
 
+export function getCurrentColor(renderTreeNode: RenderTreeNode): string {
+  return getStyle(renderTreeNode).get("color") ?? "black";
+}
+
 function collectStyleRules(
   childNodes: DefaultTreeAdapterMap["childNode"][],
 ): StyleRuleWithSelector[] {
