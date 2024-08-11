@@ -80,10 +80,10 @@ function applyStyleRules(
   styleRules: StyleRuleWithSelector[],
 ): RenderTreeNode[] {
   if (element.nodeName === "#text") {
-    const contents = (
-      element as DefaultTreeAdapterMap["textNode"]
-    ).value.trim();
-    if (contents === "") {
+    const contents = trimConsecutiveSpaces(
+      (element as DefaultTreeAdapterMap["textNode"]).value,
+    );
+    if (contents === " ") {
       // I'm not sure if this is the right behavior, but this helps to reduce debug logs.
       return [];
     }
@@ -178,6 +178,10 @@ function matchesSelector(
         `Unsupported selector type: ${(selector as SimpleSelector).type}`,
       );
   }
+}
+
+function trimConsecutiveSpaces(value: string): string {
+  return value.replace(/\s+/g, " ");
 }
 
 // Some of them are extracted from https://searchfox.org/mozilla-central/source/layout/style/res/html.css
