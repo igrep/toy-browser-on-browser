@@ -97,10 +97,9 @@ function calculateWidth(layoutBox: LayoutBox, container: Dimensions): void {
   const borderRight =
     style.get("border-right-width") ?? style.get("border-width") ?? "0";
 
-  const paddingLeft =
-    style.get("padding-left-width") ?? style.get("padding-width") ?? "0";
+  const paddingLeft = style.get("padding-left") ?? style.get("padding") ?? "0";
   const paddingRight =
-    style.get("padding-right-width") ?? style.get("padding-width") ?? "0";
+    style.get("padding-right") ?? style.get("padding") ?? "0";
 
   let width =
     layoutBox.renderTreeNode.type === "text"
