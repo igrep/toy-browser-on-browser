@@ -13,8 +13,9 @@
 ## 主に参考にした "Let's build a browser engine!" との違い
 
 - CSSの値における単位は、何を指定していようと暗黙にpxとして解釈される
-- `display`は`inline`, `block`のみに対応
 - textなど、「TODO」としていたレイアウト処理の実装
+- `border-style: solid`に対応（`border-style`を指定しなかった場合の挙動が仕様により近い）
+- `border-top-color`などに対応
 
 ## その他、学習のために盛り込んだ各種要素技術（と主な参考ページ）
 
