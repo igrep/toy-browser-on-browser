@@ -35,15 +35,23 @@ export class Engine {
     };
   }
 
-  canvasReady(canvas: OffscreenCanvas): void {
+  canvasReady(canvas: OffscreenCanvas, initialUrl: string): void {
     this.#worker.postMessage(
-      { type: "CanvasReady", canvas } satisfies CanvasReady,
+      { type: "CanvasReady", canvas, initialUrl } satisfies CanvasReady,
       [canvas],
     );
   }
 
+  canvasReadyWithPath(canvas: OffscreenCanvas, path: string): void {
+    this.canvasReady(canvas, `toy-browser://${path}`);
+  }
+
   visitPage(url: string): void {
     this.#worker.postMessage({ type: "VisitPage", url } satisfies VisitPage);
+  }
+
+  visitPath(path: string): void {
+    this.visitPage(`toy-browser://${path}`);
   }
 
   onStartLoading(callback: (path: string) => void): void {
@@ -60,10 +68,6 @@ export class Engine {
 
   removeOnFinishLoading(callback: (loadedDocument: string) => void): void {
     this.#onFinishLoading.delete(callback);
-  }
-
-  terminate(): void {
-    this.#worker.terminate();
   }
 }
 

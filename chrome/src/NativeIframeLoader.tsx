@@ -1,20 +1,24 @@
 import { type SyntheticEvent, useCallback, useState } from "react";
+import { useAtom } from "jotai";
 
 import {
   type Engine,
   useOnStartLoading,
 } from "@igrep/toy-browser-on-browser-engine/src/to-chrome-facade";
 import { PAGE_HEIGHT, PAGE_WIDTH } from "./contants";
-import { getFlagInHash } from "./hash-params";
+import { nativeIframeOpenAtom } from "./hash-state";
 
 export function NativeIframeLoader({ engine }: { engine: Engine }) {
   const [path, setPath] = useState<string | null>(null);
   useOnStartLoading(engine, setPath);
 
-  const [open, setOpen] = useState(getFlagInHash("nativeIframeOpen"));
-  const onToggle = useCallback((event: SyntheticEvent<HTMLDetailsElement>) => {
-    setOpen(event.currentTarget.open);
-  }, []);
+  const [open, setOpen] = useAtom(nativeIframeOpenAtom);
+  const onToggle = useCallback(
+    (event: SyntheticEvent<HTMLDetailsElement>) => {
+      setOpen(event.currentTarget.open);
+    },
+    [setOpen],
+  );
 
   return (
     <details onToggle={onToggle} open={open}>

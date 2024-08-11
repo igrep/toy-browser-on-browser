@@ -7,6 +7,9 @@
   "scripts": {},
   "dependencies": {
     "@igrep/toy-browser-on-browser-engine": "^0.0.0",
+    "jotai": "^2.9.2",
+    "jotai-optics": "^0.4.0",
+    "optics-ts": "^2.4.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
