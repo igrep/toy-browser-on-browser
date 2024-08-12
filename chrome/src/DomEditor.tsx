@@ -170,10 +170,9 @@ function TextNodeEditor({
       />
       <br />
       <button onClick={remove}>X</button>
-      <input
-        value={node.value}
-        onChange={(e) => setNode({ ...node, value: e.target.value })}
-      />
+      <textarea onChange={(e) => setNode({ ...node, value: e.target.value })}>
+        {node.value}
+      </textarea>
     </div>
   );
 }
