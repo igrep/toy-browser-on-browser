@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 tsconfig.tsbuildinfo
 *.js.map
+
+# Local Netlify folder
+.netlify
