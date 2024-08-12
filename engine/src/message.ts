@@ -1,4 +1,4 @@
-export type ToEngineMessage = CanvasReady | VisitPage;
+export type ToEngineMessage = CanvasReady | VisitPage | DomUpdate;
 
 export interface CanvasReady {
   type: "CanvasReady";
@@ -9,6 +9,11 @@ export interface CanvasReady {
 export interface VisitPage {
   type: "VisitPage";
   url: string;
+}
+
+export interface DomUpdate {
+  type: "DomUpdate";
+  html: string;
 }
 
 export type FromEngineMessage = StartLoading | FinishLoading;

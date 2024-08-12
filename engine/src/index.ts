@@ -5,6 +5,7 @@ import { sendMessage } from "./to-engine-facade";
 import { displayDomOnCanvas, parseToyBrowserProtocol } from "./core";
 
 let canvas: OffscreenCanvas | null = null;
+let currentUrl: string | null = null;
 
 addEventListener("message", (e) => {
   switch (e.data.type) {
@@ -30,6 +31,28 @@ addEventListener("message", (e) => {
       fetchAndDisplayPage(url, canvas);
       break;
     }
+    case "DomUpdate": {
+      if (canvas == null) {
+        console.error("Canvas is not ready");
+        return;
+      }
+      if (currentUrl == null) {
+        console.error("No URL set yet");
+        return;
+      }
+
+      const { html } = e.data;
+
+      const path = parseToyBrowserProtocol(currentUrl);
+      sendMessage({ type: "StartLoading", path });
+
+      const dom = parse5.parse(html);
+      displayDomOnCanvas(dom, canvas);
+
+      sendMessage({ type: "FinishLoading", loadedDocument: html });
+
+      break;
+    }
     default:
       console.error("Unknown message", e.data);
       break;
@@ -51,9 +74,11 @@ async function fetchAndDisplayPage(
     return;
   }
 
-  const domString = await res.text();
-  const dom = parse5.parse(domString);
+  const html = await res.text();
+  const dom = parse5.parse(html);
   displayDomOnCanvas(dom, canvas);
 
-  sendMessage({ type: "FinishLoading", loadedDocument: domString });
+  sendMessage({ type: "FinishLoading", loadedDocument: html });
+
+  currentUrl = url;
 }

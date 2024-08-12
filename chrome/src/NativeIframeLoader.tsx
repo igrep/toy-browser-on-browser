@@ -1,4 +1,4 @@
-import { type SyntheticEvent, useCallback, useState } from "react";
+import { type ChangeEvent, useCallback, useState } from "react";
 import { useAtom } from "jotai";
 
 import {
@@ -14,7 +14,7 @@ export function NativeIframeLoader({ engine }: { engine: Engine }) {
 
   const [open, setOpen] = useAtom(nativeIframeOpenAtom);
   const onToggle = useCallback(
-    (event: SyntheticEvent<HTMLDetailsElement>) => {
+    (event: ChangeEvent<HTMLDetailsElement>) => {
       setOpen(event.currentTarget.open);
     },
     [setOpen],

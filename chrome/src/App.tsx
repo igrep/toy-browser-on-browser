@@ -7,6 +7,7 @@ import { StatusIndicator } from "./StatusIndicator";
 import { NativeIframeLoader } from "./NativeIframeLoader";
 import { PAGE_HEIGHT, PAGE_WIDTH } from "./contants";
 import { AddressBar } from "./AddressBar";
+import { DomEditorLoader } from "./DomEditorLoader";
 
 const canvasIsTransferredAtom = atom(false);
 
@@ -42,6 +43,7 @@ function App({ engine }: { engine: Engine }) {
       <StatusIndicator engine={engine} />
       <div style={{ height: "1rem" }}></div>
       <NativeIframeLoader engine={engine} />
+      <DomEditorLoader engine={engine} />
     </>
   );
 }

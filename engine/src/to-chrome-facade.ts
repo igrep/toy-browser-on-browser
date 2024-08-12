@@ -5,6 +5,7 @@ import type {
   VisitPage,
   FinishLoading,
   StartLoading,
+  DomUpdate,
 } from "./message";
 
 export class Engine {
@@ -52,6 +53,10 @@ export class Engine {
 
   visitPath(path: string): void {
     this.visitPage(`toy-browser://${path}`);
+  }
+
+  domUpdate(html: string): void {
+    this.#worker.postMessage({ type: "DomUpdate", html } satisfies DomUpdate);
   }
 
   onStartLoading(callback: (path: string) => void): void {
