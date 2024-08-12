@@ -1,5 +1,11 @@
 # Toy Browser on Browser
 
+ブラウザーの仕組みを学ぶために実装した、ブラウザー上で動作するブラウザーエンジン + すごく荒削りなDOMエディターのおまけ付き。
+
+![screenshot1](./docs/screenshot1.png)
+
+![screenshot2](./docs/screenshot2.png)
+
 ## 参考
 
 - [ちいさな Web ブラウザを作ってみよう](https://browserbook.shift-js.info/) シリーズ
