@@ -43,11 +43,13 @@ function ChildNodesEditor({
   nodesAtom: PrimitiveAtom<DefaultTreeAdapterMap["document"]["childNodes"]>;
   parentNode: DefaultTreeAdapterMap["parentNode"];
 }) {
-  const childNodesAtomsAtom = useMemo(() => splitAtom(nodesAtom), [nodesAtom]);
-  const [childNodesAtoms, dispatch] = useAtom(childNodesAtomsAtom);
+  const [nodes] = useAtom(nodesAtom);
+  const nodesAtomsAtom = useMemo(() => splitAtom(nodesAtom), [nodesAtom]);
+  const [nodesAtoms, dispatch] = useAtom(nodesAtomsAtom);
+  const lastNode = nodes.at(-1);
   return (
     <>
-      {childNodesAtoms.map((nodeAtom) => (
+      {nodesAtoms.map((nodeAtom) => (
         <NodeEditor
           nodeAtom={nodeAtom}
           insertBefore={(newNode, referenceNodeAtom) => {
@@ -63,10 +65,10 @@ function ChildNodesEditor({
       ))}
       <InsertButton
         insert={(newNode) => {
-          console.log(newNode);
           dispatch({ type: "insert", value: newNode });
         }}
         parentNode={parentNode}
+        siblingIsText={lastNode != null && lastNode.nodeName === "#text"}
       />
     </>
   );
@@ -155,7 +157,6 @@ function TextNodeEditor({
       <InsertButton
         insert={useCallback(
           (newNode) => {
-            console.log(newNode);
             insertBefore(
               newNode,
               nodeAtom as PrimitiveAtom<DefaultTreeAdapterMap["childNode"]>,
@@ -164,6 +165,7 @@ function TextNodeEditor({
           [nodeAtom, insertBefore],
         )}
         parentNode={parentNode}
+        siblingIsText={true}
       />
       <br />
       <button onClick={remove}>X</button>
@@ -196,7 +198,6 @@ function ElementNodeEditor({
       <InsertButton
         insert={useCallback(
           (newNode) => {
-            console.log(newNode);
             insertBefore(
               newNode,
               nodeAtom as PrimitiveAtom<DefaultTreeAdapterMap["childNode"]>,
@@ -205,6 +206,7 @@ function ElementNodeEditor({
           [nodeAtom, insertBefore],
         )}
         parentNode={parentNode}
+        siblingIsText={false}
       />
       <br />
       <details open style={{ padding: "1em" }}>
@@ -222,9 +224,11 @@ function ElementNodeEditor({
 function InsertButton({
   insert,
   parentNode,
+  siblingIsText,
 }: {
   insert: (newNode: DefaultTreeAdapterMap["childNode"]) => void;
   parentNode: DefaultTreeAdapterMap["parentNode"];
+  siblingIsText: boolean;
 }) {
   const onChange = useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -233,8 +237,7 @@ function InsertButton({
           // do nothing
           break;
         case "#text":
-          alert("BUG: Text nodes are not correctly supported!");
-          insert({ nodeName: "#text", value: "", parentNode });
+          insert({ nodeName: "#text", value: "REPLACE ME", parentNode });
           break;
         case "element": {
           const defaultTagName = "div";
@@ -261,8 +264,16 @@ function InsertButton({
   return (
     <select onChange={onChange}>
       <option value="default">+</option>
-      <option value="#text">Text</option>
       <option value="element">Element</option>
+      <option
+        value="#text"
+        disabled={siblingIsText}
+        title={
+          siblingIsText ? "You can't insert text before/after a text node." : ""
+        }
+      >
+        Text
+      </option>
     </select>
   );
 }
