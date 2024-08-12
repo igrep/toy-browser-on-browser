@@ -20,6 +20,7 @@ export function DomEditor({
       atom(
         (get) => parse5.parse(get(htmlAtom)),
         (_get, set, action: DefaultTreeAdapterMap["document"]) => {
+          // useTransition here if parse5.serialize is too heavy?
           const newHtml = parse5.serialize(action);
           set(htmlAtom, newHtml);
           engine.domUpdate(newHtml);
