@@ -236,31 +236,37 @@ center {
 
 h1 {
   display: block;
-  margin: 26;
+  margin-top: 26;
+  margin-bottom: 26;
 }
 
 h2 {
   display: block;
-  margin: 19;
+  margin-top: 19;
+  margin-bottom: 19;
 }
 
 h3 {
   display: block;
-  margin: 19;
+  margin-top: 19;
+  margin-bottom: 19;
 }
 
 h4 {
   display: block;
-  margin: 21.5;
+  margin-top: 21.5;
+  margin-bottom: 21.5;
 }
 
 h5 {
   display: block;
-  margin-block: 22;
+  margin-top: 22;
+  margin-bottom: 22;
 }
 
 h6 {
   display: block;
-  margin: 24;
+  margin-top: 24;
+  margin-bottom: 24;
 }
 `);
